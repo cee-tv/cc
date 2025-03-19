@@ -885,6 +885,18 @@ function changeChannel(channelId) {
     
     video.style.display = 'block';
     
+    // Remove previous selected class
+    const previousSelected = document.querySelector('.category li.selected');
+    if (previousSelected) {
+        previousSelected.classList.remove('selected');
+    }
+    
+    // Add selected class to current channel
+    const currentChannel = document.querySelector(`.category li[onclick="changeChannel('${channelId}')"]`);
+    if (currentChannel) {
+        currentChannel.classList.add('selected');
+    }
+    
     // Abort any pending operations on the player before loading new channel
     if (shakaPlayer) {
         shakaPlayer.unload().catch(error => {
@@ -897,6 +909,46 @@ function changeChannel(channelId) {
     setTimeout(() => {
         channelInfo.style.display = 'none';
     }, 3000);
+}
+
+function toggleChannelListWithKeyboard() {
+    const channelList = document.getElementById('channel-list');
+    isChannelListVisible = !isChannelListVisible;
+
+    if (isChannelListVisible) {
+        channelList.style.display = 'block';
+        setTimeout(() => {
+            channelList.classList.add('visible');
+            // Find the current channel in the list
+            const currentChannelId = Object.keys(channels)[currentChannelIndex];
+            const currentChannel = document.querySelector(`.category li[onclick="changeChannel('${currentChannelId}')"]`);
+            
+            if (currentChannel) {
+                // Remove any existing selections
+                const prevSelected = document.querySelector('.category li.selected');
+                if (prevSelected) {
+                    prevSelected.classList.remove('selected');
+                }
+                
+                // Add selected class to current channel
+                currentChannel.classList.add('selected');
+                selectedChannelIndex = Array.from(document.querySelectorAll('.category li')).indexOf(currentChannel);
+                
+                // Scroll to the current channel
+                currentChannel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }, 10);
+    } else {
+        channelList.classList.remove('visible');
+        setTimeout(() => {
+            channelList.style.display = 'none';
+            // Remove selection when closing
+            const selected = document.querySelector('.category li.selected');
+            if (selected) {
+                selected.classList.remove('selected');
+            }
+        }, 300);
+    }
 }
 
 // Initialize when document is loaded
@@ -1108,7 +1160,7 @@ document.addEventListener('keydown', (e) => {
                 e.preventDefault();
                 navigateChannelList(-1);
             } else {
-                changeChannelRelative(1);
+                changeChannelRelative(-1);
             }
             break;
         case 'arrowdown':
@@ -1116,7 +1168,7 @@ document.addEventListener('keydown', (e) => {
                 e.preventDefault();
                 navigateChannelList(1);
             } else {
-                changeChannelRelative(-1);
+                changeChannelRelative(1);
             }
             break;
         case 'arrowleft':
@@ -1196,6 +1248,24 @@ function toggleChannelList() {
     }
 }
 
+function hideInterface(type) {
+    switch(type) {
+        case 'remote':
+            document.getElementById('remote-container').classList.add('hidden');
+            break;
+        case 'channels':
+            const channelList = document.getElementById('channel-list');
+            channelList.classList.remove('visible');
+            setTimeout(() => {
+                channelList.style.display = 'none';
+            }, 300);
+            break;
+        case 'keyboard':
+            document.getElementById('keyboard-overlay').style.display = 'none';
+            break;
+    }
+}
+
 function toggleInterface(type) {
     const channelList = document.getElementById('channel-list');
     const remoteControl = document.getElementById('remote-container');
@@ -1218,7 +1288,9 @@ function toggleInterface(type) {
                 }, 300);
             } else {
                 channelList.style.display = 'block';
-                setTimeout(() => channelList.classList.add('visible'), 10);
+                setTimeout(() => {
+                    channelList.classList.add('visible');
+                }, 10);
             }
             break;
         case 'keyboard':
@@ -1361,35 +1433,6 @@ function toggleSidebar() {
 }
 
 document.getElementById('sidebar-toggle').addEventListener('click', toggleSidebar);
-
-function toggleChannelListWithKeyboard() {
-    const channelList = document.getElementById('channel-list');
-    isChannelListVisible = !isChannelListVisible;
-
-    if (isChannelListVisible) {
-        channelList.style.display = 'block';
-        setTimeout(() => {
-            channelList.classList.add('visible');
-            // Initialize the first channel as selected
-            const channels = document.querySelectorAll('.category li');
-            if (channels.length > 0) {
-                selectedChannelIndex = 0;
-                channels[0].classList.add('selected');
-                channels[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        }, 10);
-    } else {
-        channelList.classList.remove('visible');
-        setTimeout(() => {
-            channelList.style.display = 'none';
-            // Remove selection when closing
-            const selected = document.querySelector('.category li.selected');
-            if (selected) {
-                selected.classList.remove('selected');
-            }
-        }, 300);
-    }
-}
 
 function navigateChannelList(direction) {
     const channels = Array.from(document.querySelectorAll('.category li'));
