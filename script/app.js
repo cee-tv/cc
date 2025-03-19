@@ -1107,16 +1107,26 @@ document.addEventListener('keydown', (e) => {
             changeChannelRelative(-1);
             break;
         case 'arrowleft':
-            toggleInterface('channels');
+            const channelList = document.getElementById('channel-list');
+            if (channelList.classList.contains('visible')) {
+                channelList.classList.remove('visible');
+                setTimeout(() => {
+                    channelList.style.display = 'none';
+                }, 300);
+            } else {
+                channelList.style.display = 'block';
+                setTimeout(() => channelList.classList.add('visible'), 10);
+            }
             break;
         case 'arrowright':
-            toggleInterface('keyboard');
+            const keyboardOverlay = document.getElementById('keyboard-overlay');
+            keyboardOverlay.style.display = keyboardOverlay.style.display === 'block' ? 'none' : 'block';
             break;
         case 'm':
             toggleMute();
             break;
         case 'l':
-            toggleInterface('channels');
+            toggleChannelList();
             break;
         case 'r':
             toggleInterface('remote');
@@ -1162,6 +1172,20 @@ document.getElementById('toggle-menu').addEventListener('click', function() {
     menuOverlay.style.display = menuOverlay.style.display === 'none' ? 'block' : 'none';
 });
 
+function toggleChannelList() {
+    const channelList = document.getElementById('channel-list');
+    
+    if (channelList.style.display === 'none' || !channelList.classList.contains('visible')) {
+        channelList.style.display = 'block';
+        setTimeout(() => channelList.classList.add('visible'), 10);
+    } else {
+        channelList.classList.remove('visible');
+        setTimeout(() => {
+            channelList.style.display = 'none';
+        }, 300);
+    }
+}
+
 function toggleInterface(type) {
     const channelList = document.getElementById('channel-list');
     const remoteControl = document.getElementById('remote-container');
@@ -1171,52 +1195,28 @@ function toggleInterface(type) {
     // Hide menu overlay
     menuOverlay.style.display = 'none';
 
-    // Hide all interfaces first
-    channelList.classList.remove('visible');
-    channelList.style.display = 'none';
-    remoteControl.classList.add('hidden');
-    keyboardOverlay.style.display = 'none';
-
     // Show the requested interface
     switch(type) {
         case 'remote':
-            remoteControl.classList.remove('hidden');
+            remoteControl.classList.toggle('hidden');
             break;
         case 'channels':
-            channelList.style.display = 'block';
-            setTimeout(() => channelList.classList.add('visible'), 10);
+            if (channelList.classList.contains('visible')) {
+                channelList.classList.remove('visible');
+                setTimeout(() => {
+                    channelList.style.display = 'none';
+                }, 300);
+            } else {
+                channelList.style.display = 'block';
+                setTimeout(() => channelList.classList.add('visible'), 10);
+            }
             break;
         case 'keyboard':
-            keyboardOverlay.style.display = 'block';
+            keyboardOverlay.style.display = keyboardOverlay.style.display === 'block' ? 'none' : 'block';
             break;
     }
 }
 
-function hideInterface(type) {
-    const channelList = document.getElementById('channel-list');
-    const remoteControl = document.getElementById('remote-container');
-    const keyboardOverlay = document.getElementById('keyboard-overlay');
-    const sidebarBtn = document.getElementById('sidebar-toggle');
-
-    switch(type) {
-        case 'remote':
-            remoteControl.classList.add('hidden');
-            break;
-        case 'channels':
-            channelList.classList.remove('visible');
-            sidebarBtn.classList.remove('active');
-            sidebarBtn.innerHTML = '❯';
-            setTimeout(() => {
-                channelList.style.display = 'none';
-            }, 300);
-            break;
-        case 'keyboard':
-            keyboardOverlay.style.display = 'none';
-            break;
-    }
-}
-
-// Update click event listener to include keyboard overlay
 document.addEventListener('click', (event) => {
     const channelList = document.getElementById('channel-list');
     const remoteControl = document.getElementById('remote-container');
@@ -1229,15 +1229,16 @@ document.addEventListener('click', (event) => {
         !channelList.contains(event.target) && 
         !toggleMenuBtn.contains(event.target) &&
         !sidebarBtn.contains(event.target)) {
-        hideInterface('channels');
-        sidebarBtn.classList.remove('active');
-        sidebarBtn.innerHTML = '❯';
+        channelList.classList.remove('visible');
+        setTimeout(() => {
+            channelList.style.display = 'none';
+        }, 300);
     }
 
     if (!remoteControl.classList.contains('hidden') && 
         !remoteControl.contains(event.target) && 
         !toggleMenuBtn.contains(event.target)) {
-        hideInterface('remote');
+        remoteControl.classList.add('hidden');
     }
 
     if (menuOverlay.style.display !== 'none' && 
@@ -1249,7 +1250,7 @@ document.addEventListener('click', (event) => {
     if (keyboardOverlay.style.display !== 'none' && 
         !keyboardOverlay.contains(event.target) && 
         !toggleMenuBtn.contains(event.target)) {
-        hideInterface('keyboard');
+        keyboardOverlay.style.display = 'none';
     }
 });
 
