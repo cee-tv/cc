@@ -12,7 +12,7 @@ const channels = {
     gmapinoy: {
         number: 2,
         name: "GMA Pinoy TV",
-        url: "https://amg01006-abs-cbn-abscbnono-dzsx9.amagi.tv/index.mpd",
+        url: "https://cdn-uw2-prod.tsv2.amagi.tv/linear/amg01006-abs-cbn-abscbn-gma-x7-dash-abscbnono/7c693236-e0c1-40a3-8bd0-bb25e43f5bfc/index.mpd",
         drmConfig: {
             clearKeys: {
                 'c95ed4c44b0b4f7fa1c6ebbbbaab21a1': '47635b8e885e19f2ccbdff078c207058'
