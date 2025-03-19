@@ -241,7 +241,8 @@ body {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
     overflow-y: auto;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .channel-list::-webkit-scrollbar {
@@ -275,38 +276,14 @@ body {
 }
 
 .channel-list li {
-    padding: 3px 5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.85em;
+    margin-bottom: 8px;
     opacity: 0.8;
-    color: rgba(255, 255, 255, 0.8);
-    user-select: none;
-    position: relative;
-}
-
-.channel-list li.selected {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    padding: 3px 5px;
-    margin: -1px;  /* Compensate for border */
-    border-radius: 3px;
-}
-
-.channel-list li:focus {
-    outline: none;
-}
-
-.channel-list li.selected:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: none;
+    transition: opacity 0.2s;
+    cursor: pointer;
 }
 
 .channel-list li:hover {
-    color: #fff;
-    transform: translateX(5px);
     opacity: 1;
-    background: rgba(255, 255, 255, 0.1);
 }
 
 .channel-list.visible {
@@ -781,10 +758,11 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    scroll-behavior: smooth;
 }
 
 .category {
-    padding: 10px;
+    padding: 0;
     background: none;
 }
 
@@ -803,38 +781,21 @@ body {
 }
 
 .category li {
-    padding: 3px 5px;
+    padding: 5px 10px;
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 0.85em;
     opacity: 0.8;
     color: rgba(255, 255, 255, 0.8);
-    user-select: none;
-    position: relative;
+    border-radius: 4px;
 }
 
 .category li.selected {
     background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    padding: 3px 5px;
-    margin: -1px;  /* Compensate for border */
-    border-radius: 3px;
-}
-
-.category li:focus {
-    outline: none;
-}
-
-.category li.selected:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: none;
-}
-
-.category li:hover {
     color: #fff;
-    transform: translateX(5px);
     opacity: 1;
-    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 /* Add loading indicator styles */
