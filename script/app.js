@@ -721,6 +721,9 @@ let retryCount = 0;
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000; // 2 seconds
 
+let selectedChannelIndex = -1;
+let allChannelElements = [];
+
 // Initialize Shaka Player
 function initApp() {
     shaka.polyfill.installAll();
@@ -1096,58 +1099,132 @@ function changeChannelRelative(direction) {
 document.addEventListener('keydown', (e) => {
     if (!isPoweredOn && e.key !== 'p') return;
     
+    const channelList = document.getElementById('channel-list');
+    const isChannelListVisible = channelList.classList.contains('visible');
+    
     switch(e.key.toLowerCase()) {
-        case 'p':
-            togglePower();
-            break;
-        case 'arrowup':
-            changeChannelRelative(1);
-            break;
-        case 'arrowdown':
-            changeChannelRelative(-1);
-            break;
         case 'arrowleft':
-            const channelList = document.getElementById('channel-list');
-            if (channelList.classList.contains('visible')) {
+            if (isChannelListVisible) {
                 channelList.classList.remove('visible');
                 setTimeout(() => {
                     channelList.style.display = 'none';
+                    // Reset selection when closing
+                    clearChannelSelection();
                 }, 300);
             } else {
                 channelList.style.display = 'block';
-                setTimeout(() => channelList.classList.add('visible'), 10);
+                setTimeout(() => {
+                    channelList.classList.add('visible');
+                    // Initialize channel navigation
+                    initializeChannelNavigation();
+                }, 10);
             }
             break;
-        case 'arrowright':
-            const keyboardOverlay = document.getElementById('keyboard-overlay');
-            keyboardOverlay.style.display = keyboardOverlay.style.display === 'block' ? 'none' : 'block';
+            
+        case 'arrowup':
+            if (isChannelListVisible) {
+                e.preventDefault();
+                navigateChannelList(-1);
+            } else {
+                changeChannelRelative(1);
+            }
             break;
-        case 'm':
-            toggleMute();
+            
+        case 'arrowdown':
+            if (isChannelListVisible) {
+                e.preventDefault();
+                navigateChannelList(1);
+            } else {
+                changeChannelRelative(-1);
+            }
             break;
-        case 'l':
-            toggleChannelList();
+            
+        case 'enter':
+            if (isChannelListVisible && selectedChannelIndex >= 0) {
+                const selectedChannel = allChannelElements[selectedChannelIndex];
+                if (selectedChannel) {
+                    // Extract channel ID from onclick attribute
+                    const onclickAttr = selectedChannel.getAttribute('onclick');
+                    const channelId = onclickAttr.match(/changeChannel\('(.+?)'\)/)[1];
+                    changeChannel(channelId);
+                    // Close channel list after selection
+                    channelList.classList.remove('visible');
+                    setTimeout(() => {
+                        channelList.style.display = 'none';
+                        clearChannelSelection();
+                    }, 300);
+                }
+            }
             break;
-        case 'r':
-            toggleInterface('remote');
-            break;
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            inputChannel(parseInt(e.key));
-            break;
+            
+        // ... rest of the existing key handlers ...
     }
 });
 
-let isMuted = false;
-let previousVolume = 1;
+function initializeChannelNavigation() {
+    // Get all channel elements
+    allChannelElements = Array.from(document.querySelectorAll('.category li'));
+    
+    // Select first channel if none selected
+    if (selectedChannelIndex === -1 && allChannelElements.length > 0) {
+        selectedChannelIndex = 0;
+        allChannelElements[0].classList.add('selected');
+        allChannelElements[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+function navigateChannelList(direction) {
+    if (allChannelElements.length === 0) return;
+    
+    // Clear current selection
+    if (selectedChannelIndex >= 0) {
+        allChannelElements[selectedChannelIndex].classList.remove('selected');
+    }
+    
+    // Update index
+    selectedChannelIndex += direction;
+    
+    // Handle wrapping
+    if (selectedChannelIndex >= allChannelElements.length) {
+        selectedChannelIndex = 0;
+    } else if (selectedChannelIndex < 0) {
+        selectedChannelIndex = allChannelElements.length - 1;
+    }
+    
+    // Apply new selection
+    const selectedElement = allChannelElements[selectedChannelIndex];
+    selectedElement.classList.add('selected');
+    
+    // Scroll into view
+    selectedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function clearChannelSelection() {
+    if (selectedChannelIndex >= 0 && allChannelElements[selectedChannelIndex]) {
+        allChannelElements[selectedChannelIndex].classList.remove('selected');
+    }
+    selectedChannelIndex = -1;
+    allChannelElements = [];
+}
+
+// Modify the toggleChannelList function to handle selection
+function toggleChannelList() {
+    const channelList = document.getElementById('channel-list');
+    
+    if (channelList.style.display === 'none' || !channelList.classList.contains('visible')) {
+        channelList.style.display = 'block';
+        setTimeout(() => {
+            channelList.classList.add('visible');
+            initializeChannelNavigation();
+        }, 10);
+    } else {
+        channelList.classList.remove('visible');
+        setTimeout(() => {
+            channelList.style.display = 'none';
+            clearChannelSelection();
+        }, 300);
+    }
+}
 
 function toggleMute() {
     if (!isPoweredOn) return;
@@ -1171,20 +1248,6 @@ document.getElementById('toggle-menu').addEventListener('click', function() {
     const menuOverlay = document.getElementById('menu-overlay');
     menuOverlay.style.display = menuOverlay.style.display === 'none' ? 'block' : 'none';
 });
-
-function toggleChannelList() {
-    const channelList = document.getElementById('channel-list');
-    
-    if (channelList.style.display === 'none' || !channelList.classList.contains('visible')) {
-        channelList.style.display = 'block';
-        setTimeout(() => channelList.classList.add('visible'), 10);
-    } else {
-        channelList.classList.remove('visible');
-        setTimeout(() => {
-            channelList.style.display = 'none';
-        }, 300);
-    }
-}
 
 function toggleInterface(type) {
     const channelList = document.getElementById('channel-list');
