@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Türk Televizyonu</title>
+    <title>CEE TV</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.6/shaka-player.compiled.js"></script>
     <link rel="stylesheet" href="style/main.css">
 </head>
@@ -23,10 +23,9 @@
             </div>
             <button class="sidebar-toggle" id="sidebar-toggle">❯</button>
             <button id="toggle-menu" class="toggle-menu-btn">
-                ☰
+                ⚙
             </button>
             <div class="channel-list" id="channel-list" style="display: none;">
-                <button class="close-button" onclick="hideInterface('channels')">&times;</button>
                 <h3>Channel List</h3>
                 <div class="channel-categories">
                     <div class="category">
@@ -148,6 +147,7 @@
             <iframe id="youtube-embed" src="" 
                 style="display:none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                 allowfullscreen></iframe>
+            <button class="fullscreen-button">⛶</button>
             <div class="remote-container hidden" id="remote-container">
                 <button class="close-button" onclick="hideInterface('remote')">&times;</button>
                 <button class="remote-power" onclick="togglePower()" title="Power"></button>
