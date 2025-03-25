@@ -1,57 +1,73 @@
-// Service Worker for Türk TV
-const CACHE_NAME = 'turk-tv-cache-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style/main.css',
-  '/script/app.js'
-];
+importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-// Install event - Cache files
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
-});
+const HTML_CACHE = "html";
+const JS_CACHE = "javascript";
+const STYLE_CACHE = "stylesheets";
+const IMAGE_CACHE = "images";
+const FONT_CACHE = "fonts";
 
-// Activate event - Clean up old caches
-self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
-  );
-});
-
-// Fetch event - Serve from cache, then network
-self.addEventListener('fetch', event => {
-  // Skip cross-origin requests and streaming media resources
-  if (event.request.url.includes('mpd') || 
-      event.request.url.includes('dash') || 
-      event.request.url.includes('cloudfront.net') ||
-      !event.request.url.startsWith(self.location.origin)) {
-    return;
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
   }
-  
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
-  );
 });
+
+workbox.routing.registerRoute(
+  ({event}) => event.request.destination === 'document',
+  new workbox.strategies.NetworkFirst({
+    cacheName: HTML_CACHE,
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 10,
+      }),
+    ],
+  })
+);
+
+workbox.routing.registerRoute(
+  ({event}) => event.request.destination === 'script',
+  new workbox.strategies.NetworkFirst({
+    cacheName: JS_CACHE,
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 15,
+      }),
+    ],
+  })
+);
+
+workbox.routing.registerRoute(
+  ({event}) => event.request.destination === 'style',
+  new workbox.strategies.NetworkFirst({
+    cacheName: STYLE_CACHE,
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 15,
+      }),
+    ],
+  })
+);
+
+workbox.routing.registerRoute(
+  ({event}) => event.request.destination === 'image',
+  new workbox.strategies.NetworkFirst({
+    cacheName: IMAGE_CACHE,
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 15,
+      }),
+    ],
+  })
+);
+
+workbox.routing.registerRoute(
+  ({event}) => event.request.destination === 'font',
+  new workbox.strategies.NetworkFirst({
+    cacheName: FONT_CACHE,
+    plugins: [
+      new workbox.expiration.ExpirationPlugin({
+        maxEntries: 15,
+      }),
+    ],
+  })
+);
