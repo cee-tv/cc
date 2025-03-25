@@ -5,8 +5,8 @@
     <title>Türk Televizyonu</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.6/shaka-player.compiled.js"></script>
     <link rel="stylesheet" href="style/main.css">
-    <link rel="manifest" href="site.webmanifest">
-  <meta name="theme-color" content="#fafafa">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#000000">
 </head>
 <body>
 
@@ -228,6 +228,19 @@
 </div>
 
 <script src="script/app.js"></script>
-
+<script>
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      })
+      .catch(error => {
+        console.log('ServiceWorker registration failed: ', error);
+      });
+  });
+}
+</script>
 </body>
 </html>
