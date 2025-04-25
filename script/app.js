@@ -754,7 +754,7 @@ function initPlayer() {
     video.removeAttribute('controls');
     const fullscreenButton = document.createElement('button');
     fullscreenButton.className = 'fullscreen-button';
-    fullscreenButton.innerHTML = '⤢';
+    fullscreenButton.innerHTML = '';
     fullscreenButton.onclick = toggleFullscreen;
     document.querySelector('.screen').appendChild(fullscreenButton);
 }
